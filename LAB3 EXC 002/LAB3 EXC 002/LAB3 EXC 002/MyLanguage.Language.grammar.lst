@@ -1,0 +1,99 @@
+
+// ==========================================================================
+//  GPPG error listing for yacc source file <MyLanguage.Language.grammar.y - 2019/5/11 上午 10:52:06>
+// ==========================================================================
+//  Version:  1.5.2
+//  Machine:  C4-036
+//  DateTime: 2019/5/11 上午 10:52:06
+//  UserName: C4
+// ==========================================================================
+
+
+%namespace LAB3_EXC_002
+%partial
+%parsertype MyLanguageParser
+%visibility internal
+%tokentype Token
+
+%union { 
+			public int n; 
+			public double d;
+			public string s; 
+			
+	   }
+
+%start main
+
+%token INTEGER, FLOAT, OP_PLUS, OP_SUB, OP_MUL, OP_DIV, OP_EQUAL
+%token LEFT_SMALL, RIGHT_SMALL, COMMA, SEMICOMMA, EXP_FUNC, TYPE_DOUBLE, VARIABLE
+
+%{
+	Dictionary<string, double>var_table = new Dictionary<string, double>();
+%}
+
+%%
+// Error: NonTerminal symbol "SEMICMMA" has no productions
+// Warning: Terminating SEMICMMA fixes the following size-4 NonTerminal set
+   // {main, $accept, statements, SEMICMMA}
+// Error: There are 4 non-terminating NonTerminal Symbols
+   //  {main, $accept, statements, SEMICMMA}
+// ------------------------------------------------------------------------
+
+main   : statements
+		;
+statements : statements statement SEMICOMMA
+		{
+			foreach(KeyValuePair<string, double> v in var_table)
+			{
+				Console.Write("{0} = {1}\n", v.Key, v.Value);
+			}
+		}
+		| statement SEMICMMA
+		{
+			foreach(KeyValuePair<string, double> v in var_table)
+			{
+				Console.Write("{0} = {1}\n", v.Key, v.Value);
+			}
+		}
+       ;
+statement : operation
+		| declare
+		;
+
+operation : VARIABLE OP_EQUAL expression	{var_table[$1.s]=$3.d;}
+		;
+
+declare : var_type var_list
+		;
+
+var_type : TYPE_DOUBLE
+		;
+
+var_list : var_init
+		| var_init COMMA var_list
+		;
+
+var_init : VARIABLE							{}
+		|	VARIABLE OP_EQUAL expression	{Console.Write("{0}", $1.s);}
+		;
+
+expression : term							{$$.d=$1.d;}
+		| expression OP_PLUS term			{$$.d=$1.d+$3.d;}
+		| expression OP_SUB term			{$$.d=$1.d-$3.d;}
+		;
+term : factor								{$$.d=$1.d;}
+		| term OP_MUL factor				{$$.d=$1.d*$3.d;}
+		| term OP_DIV factor				{$$.d=$1.d/$3.d;}
+		;
+factor : number								{$$.d=$1.d;}
+		| OP_SUB number						{$$.d=-$2.d;}
+		| EXP_FUNC LEFT_SMALL expression COMMA expression RIGHT_SMALL
+		{$$.d=Math.Pow($3.d, $5.d);}
+		| LEFT_SMALL expression RIGHT_SMALL	{$$.d=$2.d;}
+		;
+number : INTEGER							{$$.d=$1.n;}
+		| FLOAT								{$$.d=$1.d;}
+		;
+
+%%// ==========================================================================
+
