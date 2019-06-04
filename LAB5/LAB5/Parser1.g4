@@ -33,17 +33,15 @@ statement : operation
 				}
 				if($expression.exprVar != 0)
 				{
-					if($expression.exprVar % 2 == 1)
+					if($expression.exprVar % 2 == 0)
+					{
+						Console.Write("even number.\n");
+					}
+					else
 					{
 						Console.Write("odd number.\n");
 					}
-					else if($expression.exprVar % 2 == 0)
-					{
-						Console.Write("even number.\n", $expression.exprVar);
-					}
 				}
-
-
 			}
 		  ;
 
